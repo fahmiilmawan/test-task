@@ -1,0 +1,70 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: docker/php/Dockerfile
+        image: test-task-app
+        container_name: test-task-app
+        restart: unless-stopped
+        working_dir: /var/www/html
+        volumes:
+            - ./:/var/www/html
+        networks:
+            - test-task-network
+        depends_on:
+            - db
+
+    web:
+        image: nginx:alpine
+        container_name: test-task-web
+        restart: unless-stopped
+        ports:
+            - "8081:80"
+        volumes:
+            - ./:/var/www/html
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        networks:
+            - test-task-network
+        depends_on:
+            - app
+
+    db:
+        image: mysql:8.0
+        container_name: test-task-db
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            # MYSQL_USER: ${DB_USERNAME}
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        volumes:
+            - dbdata:/var/lib/mysql
+        networks:
+            - test-task-network
+        ports:
+            - "${FORWARD_DB_PORT:-3307}:3306"
+
+    pma:
+        image: phpmyadmin/phpmyadmin
+        container_name: test-task-pma
+        restart: unless-stopped
+        environment:
+            PMA_HOST: host.docker.internal
+            PMA_PORT: 3306
+            PMA_ARBITRARY: 1
+        ports:
+            - "8080:80"
+        networks:
+            - test-task-network
+        depends_on:
+            - db
+
+networks:
+    test-task-network:
+        driver: bridge
+
+volumes:
+    dbdata:
+        driver: local
