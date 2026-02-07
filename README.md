@@ -22,7 +22,7 @@ Berikut adalah langkah-langkah untuk menjalankan aplikasi ini menggunakan Docker
     ```bash
     cp .env.example .env
     ```
-    *Pastikan konfigurasi database di `.env` sesuai dengan Docker (DB_HOST=mysql, DB_USERNAME=sail, DB_PASSWORD=password).*
+    *Pastikan konfigurasi database di `.env` sesuai dengan Docker (DB_HOST=mysql, DB_PASSWORD=password).*
 
 3.  **Jalankan Docker Container**
     Jalankan perintah berikut untuk membangun dan menyalakan container:
